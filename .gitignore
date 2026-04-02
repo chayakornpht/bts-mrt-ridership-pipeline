@@ -1,0 +1,30 @@
+# Environment
+.env
+*.pyc
+__pycache__/
+.venv/
+
+# Airflow
+logs/
+airflow.cfg
+
+# Data files (too large for git)
+data/pdfs/*.pdf
+data/raw/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Docker volumes
+postgres-airflow-data/
+postgres-warehouse-data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

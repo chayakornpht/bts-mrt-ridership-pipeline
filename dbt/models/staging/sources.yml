@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: "Raw data extracted from BEM, BTS, and Google Maps"
+    tables:
+      - name: bem_ridership
+        description: "Monthly ridership from BEM investor relations"
+        columns:
+          - name: id
+            tests: [unique, not_null]
+          - name: line_name
+            tests: [not_null]
+          
+      - name: bts_ridership
+        description: "Annual/quarterly ridership from BTS PDF reports"
+        columns:
+          - name: id
+            tests: [unique, not_null]
+          - name: fiscal_year
+            tests: [not_null]
+            
+      - name: stations
+        description: "Master station data"
+        columns:
+          - name: station_code
+            tests: [unique, not_null]
+          - name: name_en
+            tests: [not_null]
+            
+      - name: travel_times
+        description: "Travel times from Google Maps Distance Matrix API"
+        columns:
+          - name: id
+            tests: [unique, not_null]

@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: stg_bem_ridership
+    description: "Cleaned BEM ridership data"
+    columns:
+      - name: line_name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['MRT Blue Line', 'MRT Purple Line']
+      - name: daily_avg_passengers
+        tests:
+          - not_null
+          
+  - name: stg_bts_ridership
+    description: "Cleaned BTS ridership data"
+    columns:
+      - name: line_name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['BTS Sukhumvit Line', 'BTS Silom Line', 'BTS Gold Line', 'BTS Total']
+      - name: fiscal_year
+        tests:
+          - not_null
+          
+  - name: stg_stations
+    description: "Cleaned station master data"
+    columns:
+      - name: station_code
+        tests: [unique, not_null]
+      - name: name_en
+        tests: [not_null]
+      - name: latitude
+        tests: [not_null]
+      - name: longitude
+        tests: [not_null]
+
+  - name: int_ridership_combined
+    description: "Combined BTS + MRT ridership"
+    columns:
+      - name: ridership_id
+        tests: [unique, not_null]
+      - name: line_name
+        tests: [not_null]
+      - name: period_date
+        tests: [not_null]
+
+  - name: mart_line_comparison
+    description: "Line-level ridership analytics with YoY growth"
+    columns:
+      - name: line_name
+        tests: [not_null]
+      - name: avg_daily_passengers
+        tests:
+          - not_null
+      - name: market_share_pct
+        tests:
+          - not_null
+
+  - name: mart_peak_analysis
+    description: "Travel time analytics by time slot"
+    columns:
+      - name: avg_duration_minutes
+        tests:
+          - not_null

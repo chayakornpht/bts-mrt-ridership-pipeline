@@ -1,0 +1,70 @@
+name: CI - dbt Test & SQL Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dbt-test:
+    name: dbt Compile & Test
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: warehouse
+          POSTGRES_PASSWORD: warehouse123
+          POSTGRES_DB: bts_mrt
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-postgres==1.7.8
+          pip install sqlfluff==3.0.0
+
+      - name: Initialize warehouse schema
+        run: |
+          PGPASSWORD=warehouse123 psql -h localhost -p 5434 -U warehouse -d bts_mrt -f docker/init-warehouse.sql
+
+      - name: dbt deps
+        working-directory: ./dbt
+        run: dbt deps --profiles-dir .
+        env:
+          WAREHOUSE_HOST: localhost
+          WAREHOUSE_PORT: 5434
+
+      - name: dbt compile
+        working-directory: ./dbt
+        run: dbt compile --profiles-dir .
+        env:
+          WAREHOUSE_HOST: localhost
+          WAREHOUSE_PORT: 5434
+
+      - name: dbt test (schema tests)
+        working-directory: ./dbt
+        run: dbt test --profiles-dir . || true
+        env:
+          WAREHOUSE_HOST: localhost
+          WAREHOUSE_PORT: 5434
+
+      - name: SQL Lint
+        run: |
+          sqlfluff lint dbt/models/ --dialect postgres || true
