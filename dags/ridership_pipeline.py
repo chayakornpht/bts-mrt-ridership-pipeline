@@ -139,7 +139,7 @@ with DAG(
     dag_id='bts_mrt_travel_times_daily',
     default_args=default_args,
     description='Daily travel time capture via Google Maps API',
-    schedule_interval='0 7,12,18,22 * * *',  # 4 times daily
+    schedule_interval='0 */3 * * *', #รันpipeline ทุกๆ 3ชม
     catchup=False,
     tags=['travel_time', 'google_maps', 'daily'],
 ) as dag_travel:
